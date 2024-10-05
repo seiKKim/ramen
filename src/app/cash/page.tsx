@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from 'next/navigation'; // App Router에서는 'next/navigation'에서 가져옵니다.
-import styles from "../cash/AmountInputPage.module.css"
+import { useRouter } from 'next/navigation';
+import styles from "../cash/AmountInputPage.module.css";
 
 const AmountInputPage = () => {
   const [amount, setAmount] = useState("");
@@ -10,6 +10,8 @@ const AmountInputPage = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // 금액 체크
     if (parseInt(amount) >= 3000) {
       try {
         // API 호출로 자동 로그인 처리
@@ -25,12 +27,13 @@ const AmountInputPage = () => {
         });
 
         const data = await response.json();
+        
         if (data.success) {
-          // 로그인 성공 시 주차 등록 페이지로 이동
-          router.push(data.currentUrl);
+          window.location.href = data.redirectUrl;
         } else {
-          setError("자동 로그인에 실패했습니다. 관리자에게 문의해주세요.");
+          setError("확인을 한번더 눌러주세요");
         }
+        
       } catch (error) {
         setError("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
       }
@@ -41,22 +44,24 @@ const AmountInputPage = () => {
 
   return (
     <div className={styles.container}>
-      <img src="/path-to-logo.png" alt="Starbucks Logo" className={styles.logo}/>
+      <img src="/path-to-logo.png" alt="Starbucks Logo" className={styles.logo} />
       <h1 className={styles.title}>차량등록</h1>
       <p className={styles.subTitle}>별라면을 이용해주셔서 감사합니다.</p>
-      
+
       <form onSubmit={handleSubmit} className={styles.form}>
-      <input
+        <input
           type="number"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           placeholder="결제 금액을 입력하세요"
           required
+          className={styles.input}
         />
         <button type="submit" className={styles.button}>
           차량등록하기
         </button>
       </form>
+      {error && <p className={styles.error}>{error}</p>}
     </div>
   );
 };
